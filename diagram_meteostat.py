@@ -3,11 +3,13 @@ import pandas as pd
 from meteostat import Daily, Stations
 from datetime import datetime
 
-year_input = input("Die Wetterdaten welches Jahrs soll ich darstellen? ").strip()
+year_input = input("Die Wetterdaten welches Jahrs soll ich darstellen (1931–2025)? ").strip()
 try:
     year = int(year_input)
+    if year < 1931 or year > 2025:
+        raise ValueError
 except ValueError:
-    print("Ungültige Eingabe. Bitte ein Jahr als Zahl eingeben.")
+    print("Ungültige Eingabe. Bitte ein Jahr zwischen 1931 und 2025 als Zahl eingeben.")
     exit(1)
 
 start = datetime(year, 1, 1)
@@ -16,6 +18,10 @@ end = datetime(year, 12, 31)
 stations = Stations()
 stations = stations.nearby(50.8659, 7.1427)
 station = stations.fetch(1)
+
+if station.empty:
+    print("Keine Wetterstation gefunden.")
+    exit(1)
 
 data = Daily(station.index[0], start, end)
 data = data.fetch()
